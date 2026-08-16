@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Task Management</h1>
+        <p>Manage your tasks in one place</p>
+    </header>
+
+    <section class="task-form">
+        <input
+            type="text"
+            id="taskTitle"
+            placeholder="Enter task title"
+        />
+
+        <textarea
+            id="taskDescription"
+            placeholder="Enter task description"
+        ></textarea>
+
+        <select id="taskStatus">
+            <option value="TODO">To Do</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="DONE">Done</option>
+        </select>
+
+        <button onclick="addTask()">Add Task</button>
+    </section>
+
+    <section class="task-section">
+
+        <div class="task-header">
+            <h2>Tasks</h2>
+
+            <select id="filterStatus" onchange="renderTasks()">
+                <option value="ALL">All</option>
+                <option value="TODO">To Do</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="DONE">Done</option>
+            </select>
+        </div>
+
+        <div id="taskList"></div>
+
+    </section>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
