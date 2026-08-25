@@ -138,3 +138,187 @@ button:hover {
     color: #888;
     padding: 30px;
 }
+
+/* ── Header user bar ─────────────────────────── */
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.user-greeting {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    padding: 7px 14px;
+    font-size: 13px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Login / Register page ───────────────────── */
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f6f8;
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+}
+
+.auth-header {
+    background: #1976d2;
+    color: white;
+    padding: 28px 32px 24px;
+}
+
+.auth-header h1 {
+    margin-bottom: 6px;
+    font-size: 22px;
+}
+
+.auth-header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #555;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    border-radius: 0;
+}
+
+.tab-btn:hover {
+    background: #f5f7fa;
+    color: #1976d2;
+}
+
+.tab-btn.active {
+    color: #1976d2;
+    border-bottom-color: #1976d2;
+    background: none;
+}
+
+.auth-form {
+    padding: 28px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-form.hidden {
+    display: none;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input {
+    padding: 11px 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+}
+
+.auth-btn {
+    margin-top: 4px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.auth-btn:hover {
+    background: #125ca1;
+}
+
+.auth-error {
+    display: none;
+    background: #fdecea;
+    color: #c62828;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.auth-error.visible {
+    display: block;
+}
+
+.auth-success {
+    display: none;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.auth-success.visible {
+    display: block;
+}
