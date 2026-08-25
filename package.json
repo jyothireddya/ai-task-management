@@ -1,0 +1,23 @@
+{
+  "name": "ai-task-management",
+  "version": "1.1.0",
+  "description": "AI Task Management App with User Login",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "auth.js",
+      "app.js"
+    ]
+  }
+}

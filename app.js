@@ -1,7 +1,17 @@
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+// Guard: redirect to login if not authenticated; throw to halt further execution
+if (typeof requireAuth === "function" && !requireAuth()) {
+    throw new Error("Unauthenticated — redirect in progress");
+}
+
+function getTasksKey() {
+    const user = getCurrentUser();
+    return user ? "tasks_" + user : "tasks";
+}
+
+let tasks = JSON.parse(localStorage.getItem(getTasksKey())) || [];
 
 function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem(getTasksKey(), JSON.stringify(tasks));
 }
 
 function addTask() {
@@ -107,4 +117,23 @@ function escapeHtml(value) {
     return div.innerHTML;
 }
 
+function handleLogout() {
+    logoutUser();
+    window.location.href = "login.html";
+}
+
+function initUserGreeting() {
+    const greeting = document.getElementById("userGreeting");
+    if (greeting) {
+        const user = getCurrentUser();
+        greeting.textContent = user ? "Hi, " + user : "";
+    }
+}
+
+initUserGreeting();
 renderTasks();
+
+// CommonJS export for test environments
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { addTask, deleteTask, renderTasks, formatStatus, escapeHtml, getTasksKey, handleLogout };
+}

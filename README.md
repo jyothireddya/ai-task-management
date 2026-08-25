@@ -1,57 +1,103 @@
 # AI Task Management
 
-A simple web-based task management application.
+A browser-based task management application with per-user task isolation.
 
-## Current Features
+## Features
 
-The application currently supports:
+### User Authentication (EPMEDUAI)
+- Register an account with a username and password
+- Sign in and sign out
+- Each user's tasks are stored separately
+- Unauthenticated users are redirected to the login page
+- Input validation with clear error messages
 
-- Create tasks
-- Task title
-- Task description
-- Task status
-- View tasks
-- Filter tasks by status
+### Task Management
+- Create tasks with a title, description, and status
+- View all tasks or filter by status
 - Delete tasks
-- Store tasks using browser localStorage
+- Tasks persisted in browser `localStorage` (per user)
 
 ## Task Statuses
 
-The application supports three task statuses:
-
-- TODO
-- IN_PROGRESS
-- DONE
+| Value | Label |
+|---|---|
+| `TODO` | To Do |
+| `IN_PROGRESS` | In Progress |
+| `DONE` | Done |
 
 ## Technology
 
-- HTML5
-- CSS3
-- JavaScript
-- Browser LocalStorage
+- HTML5, CSS3, vanilla JavaScript
+- Browser `localStorage` for persistence (no backend required)
+- Jest + jsdom for automated tests
 
-## How to Run
+## How to Run Locally
 
-No backend or database is required.
+No build step or server is required.
 
-Open:
+1. Clone the repository:
+   ```
+   git clone https://github.com/jyothireddya/ai-task-management.git
+   cd ai-task-management
+   ```
 
-index.html
+2. Open `login.html` in a web browser (double-click or use a local server):
+   ```
+   # macOS / Linux
+   open login.html
 
-in a web browser.
+   # Windows
+   start login.html
 
-## Current Limitations
+   # Or with a local server (e.g. VS Code Live Server, or Python):
+   python -m http.server 8080
+   # then open http://localhost:8080/login.html
+   ```
 
-The application is intentionally simple.
+3. Register a new account, then sign in to manage tasks.
 
-Potential future improvements may include:
+## Running Tests
 
-- Task priority
-- Due dates
-- Search
-- Advanced filtering
+```
+npm install
+npm test
+```
+
+The test suite covers:
+- Password hashing consistency
+- User registration (success, duplicate username, short username, short password)
+- Login (success, wrong password, unknown user, case-insensitive username)
+- Logout and session clearing
+- Authentication state checks
+- Task status formatting and HTML escaping
+- Per-user storage key generation
+
+## File Structure
+
+```
+ai-task-management/
+├── login.html       # Login / Register page (entry point)
+├── index.html       # Main task management page
+├── auth.js          # Authentication logic
+├── app.js           # Task management logic
+├── style.css        # All styles
+├── package.json     # npm / Jest configuration
+├── tests/
+│   ├── auth.test.js # Auth unit tests
+│   └── app.test.js  # App unit tests
+└── README.md
+```
+
+## Security Notes
+
+This application runs entirely in the browser with no backend.
+Passwords are hashed with a client-side algorithm for demo purposes only.
+**Do not use this for storing sensitive data in a production environment.**
+
+## Limitations & Future Improvements
+
+- Task priority and due dates
+- Full-text search
 - Task editing
-- User authentication
-- Backend API
+- Backend API with server-side authentication (e.g. JWT / OAuth)
 - Database persistence
-- Automated testing
