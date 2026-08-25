@@ -1,6 +1,6 @@
-// Guard: redirect to login if not authenticated
-if (typeof requireAuth === "function") {
-    requireAuth();
+// Guard: redirect to login if not authenticated; throw to halt further execution
+if (typeof requireAuth === "function" && !requireAuth()) {
+    throw new Error("Unauthenticated — redirect in progress");
 }
 
 function getTasksKey() {
@@ -135,5 +135,5 @@ renderTasks();
 
 // CommonJS export for test environments
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { addTask, deleteTask, renderTasks, formatStatus, escapeHtml, getTasksKey };
+    module.exports = { addTask, deleteTask, renderTasks, formatStatus, escapeHtml, getTasksKey, handleLogout };
 }
