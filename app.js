@@ -4,8 +4,8 @@ if (typeof requireAuth === "function" && !requireAuth()) {
 }
 
 function getTasksKey() {
-    const user = getCurrentUser();
-    return user ? "tasks_" + user : "tasks";
+    const email = (typeof getCurrentUserEmail === "function") ? getCurrentUserEmail() : null;
+    return email ? "tasks_" + email : "tasks";
 }
 
 let tasks = JSON.parse(localStorage.getItem(getTasksKey())) || [];
@@ -118,15 +118,15 @@ function escapeHtml(value) {
 }
 
 function handleLogout() {
-    logoutUser();
+    if (typeof logoutUI === "function") logoutUI();
     window.location.href = "login.html";
 }
 
 function initUserGreeting() {
     const greeting = document.getElementById("userGreeting");
     if (greeting) {
-        const user = getCurrentUser();
-        greeting.textContent = user ? "Hi, " + user : "";
+        const email = (typeof getCurrentUserEmail === "function") ? getCurrentUserEmail() : null;
+        greeting.textContent = email ? "Hi, " + email : "";
     }
 }
 
