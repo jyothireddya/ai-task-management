@@ -16,6 +16,7 @@
     ],
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
+      "auth-ui.js",
       "auth.js",
       "app.js"
     ]

@@ -17,31 +17,14 @@
             <p>Manage your tasks in one place</p>
         </div>
 
-        <div class="auth-tabs">
-            <button
-                id="tabLogin"
-                class="tab-btn active"
-                onclick="switchTab('login')">
-                Sign In
-            </button>
-            <button
-                id="tabRegister"
-                class="tab-btn"
-                onclick="switchTab('register')">
-                Register
-            </button>
-        </div>
-
-        <!-- Login Form -->
-        <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+        <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)" novalidate>
             <div class="form-group">
-                <label for="loginUsername">Username</label>
+                <label for="loginEmail">Email</label>
                 <input
-                    type="text"
-                    id="loginUsername"
-                    placeholder="Enter your username"
-                    autocomplete="username"
-                    required
+                    type="email"
+                    id="loginEmail"
+                    placeholder="you@example.com"
+                    autocomplete="email"
                 />
             </div>
             <div class="form-group">
@@ -49,131 +32,60 @@
                 <input
                     type="password"
                     id="loginPassword"
-                    placeholder="Enter your password"
+                    placeholder="Enter your password (6+ characters)"
                     autocomplete="current-password"
-                    required
                 />
             </div>
             <div id="loginError" class="auth-error" role="alert" aria-live="polite"></div>
-            <button type="submit" class="auth-btn">Sign In</button>
+            <button type="submit" class="auth-btn">Login</button>
         </form>
 
-        <!-- Register Form -->
-        <form id="registerForm" class="auth-form hidden" onsubmit="handleRegister(event)">
-            <div class="form-group">
-                <label for="regUsername">Username</label>
-                <input
-                    type="text"
-                    id="regUsername"
-                    placeholder="Choose a username (min 3 chars)"
-                    autocomplete="username"
-                    required
-                />
-            </div>
-            <div class="form-group">
-                <label for="regPassword">Password</label>
-                <input
-                    type="password"
-                    id="regPassword"
-                    placeholder="Choose a password (min 6 chars)"
-                    autocomplete="new-password"
-                    required
-                />
-            </div>
-            <div class="form-group">
-                <label for="regConfirm">Confirm Password</label>
-                <input
-                    type="password"
-                    id="regConfirm"
-                    placeholder="Repeat your password"
-                    autocomplete="new-password"
-                    required
-                />
-            </div>
-            <div id="registerError" class="auth-error" role="alert" aria-live="polite"></div>
-            <div id="registerSuccess" class="auth-success" role="status" aria-live="polite"></div>
-            <button type="submit" class="auth-btn">Create Account</button>
-        </form>
+        <p class="auth-demo-notice">
+            Demo app &mdash; any valid email and password (6+ chars) will work.
+            This is <strong>not</strong> real authentication.
+        </p>
 
     </div>
 
 </div>
 
-<script src="auth.js"></script>
+<script src="auth-ui.js"></script>
 <script>
-    // Redirect if already logged in
+    // Redirect to app if already logged in
     if (isAuthenticated()) {
         window.location.href = "index.html";
     }
 
-    function switchTab(tab) {
-        const isLogin = tab === "login";
-        document.getElementById("loginForm").classList.toggle("hidden", !isLogin);
-        document.getElementById("registerForm").classList.toggle("hidden", isLogin);
-        document.getElementById("tabLogin").classList.toggle("active", isLogin);
-        document.getElementById("tabRegister").classList.toggle("active", !isLogin);
-        clearMessages();
-    }
-
-    function clearMessages() {
-        ["loginError", "registerError", "registerSuccess"].forEach(id => {
-            const el = document.getElementById(id);
-            el.textContent = "";
-            el.classList.remove("visible");
-        });
-    }
-
-    function showError(elementId, message) {
-        const el = document.getElementById(elementId);
+    function showError(message) {
+        const el = document.getElementById("loginError");
         el.textContent = message;
         el.classList.add("visible");
     }
 
-    function showSuccess(elementId, message) {
-        const el = document.getElementById(elementId);
-        el.textContent = message;
-        el.classList.add("visible");
+    function clearError() {
+        const el = document.getElementById("loginError");
+        el.textContent = "";
+        el.classList.remove("visible");
     }
 
     function handleLogin(event) {
         event.preventDefault();
-        clearMessages();
+        clearError();
 
-        const username = document.getElementById("loginUsername").value;
+        const email = document.getElementById("loginEmail").value;
         const password = document.getElementById("loginPassword").value;
-        const result = loginUser(username, password);
+
+        // Always clear the password field on every login attempt, success or failure
+        document.getElementById("loginPassword").value = "";
+
+        const result = loginUI(email, password);
 
         if (!result.success) {
-            showError("loginError", result.error);
+            showError(result.error);
             return;
         }
 
         window.location.href = "index.html";
-    }
-
-    function handleRegister(event) {
-        event.preventDefault();
-        clearMessages();
-
-        const username = document.getElementById("regUsername").value;
-        const password = document.getElementById("regPassword").value;
-        const confirm = document.getElementById("regConfirm").value;
-
-        if (password !== confirm) {
-            showError("registerError", "Passwords do not match.");
-            return;
-        }
-
-        const result = registerUser(username, password);
-
-        if (!result.success) {
-            showError("registerError", result.error);
-            return;
-        }
-
-        showSuccess("registerSuccess", "Account created! You can now sign in.");
-        document.getElementById("registerForm").reset();
-        setTimeout(() => switchTab("login"), 1500);
     }
 </script>
 

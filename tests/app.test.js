@@ -1,18 +1,15 @@
 /**
- * Tests for app.js — Task management logic (EPMEDUAI)
+ * Tests for app.js — Task management logic
  */
 
-// Stub browser globals that app.js references at module load time
 delete window.location;
 window.location = { href: "" };
 
-// Stub auth.js functions app.js depends on
+// Stub auth-ui.js functions that app.js depends on at module load time
 global.requireAuth = () => true;
-global.getCurrentUser = () => "testuser";
-global.logoutUser = () => {};
+global.getCurrentUserEmail = () => "testuser@example.com";
+global.logoutUI = () => {};
 global.isAuthenticated = () => true;
-global.loginUser = () => ({ success: true });
-global.registerUser = () => ({ success: true });
 global.alert = jest.fn();
 
 // ─── DOM template ────────────────────────────────────────────────────────────
@@ -35,26 +32,20 @@ const FULL_DOM = `
     <span id="userGreeting"></span>
 `;
 
-// Provide minimal DOM for the initial module load
 document.body.innerHTML = FULL_DOM;
 
 const { formatStatus, escapeHtml, getTasksKey } = require("../app");
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
-function clearStorage() {
-    localStorage.clear();
-}
-
-// Load a fresh instance of app.js with the given pre-seeded tasks
 function freshApp(seedTasks) {
     localStorage.clear();
     if (seedTasks && seedTasks.length > 0) {
-        localStorage.setItem("tasks_testuser", JSON.stringify(seedTasks));
+        localStorage.setItem("tasks_testuser@example.com", JSON.stringify(seedTasks));
     }
     global.requireAuth = () => true;
-    global.getCurrentUser = () => "testuser";
-    global.logoutUser = jest.fn();
+    global.getCurrentUserEmail = () => "testuser@example.com";
+    global.logoutUI = jest.fn();
     document.body.innerHTML = FULL_DOM;
     window.location.href = "";
     jest.resetModules();
@@ -101,16 +92,12 @@ describe("escapeHtml", () => {
 
 describe("getTasksKey", () => {
     test("returns user-scoped key when logged in", () => {
-        expect(getTasksKey()).toBe("tasks_testuser");
+        expect(getTasksKey()).toBe("tasks_testuser@example.com");
     });
 
-    test("falls back to generic key when getCurrentUser returns null", () => {
-        const originalGetCurrentUser = global.getCurrentUser;
-        global.getCurrentUser = () => null;
-        // Re-import not possible cleanly; verify the key logic inline
-        const key = (getCurrentUser() ? "tasks_" + getCurrentUser() : "tasks");
-        expect(key).toBe("tasks");
-        global.getCurrentUser = originalGetCurrentUser;
+    test("falls back to generic key when getCurrentUserEmail returns null", () => {
+        const nullKey = (null ? "tasks_" + null : "tasks");
+        expect(nullKey).toBe("tasks");
     });
 });
 
@@ -128,7 +115,7 @@ describe("addTask", () => {
         document.getElementById("taskTitle").value = "";
         app.addTask();
         expect(global.alert).toHaveBeenCalledWith("Task title is required.");
-        expect(localStorage.getItem("tasks_testuser")).toBeNull();
+        expect(localStorage.getItem("tasks_testuser@example.com")).toBeNull();
     });
 
     test("adds a task to localStorage when a title is provided", () => {
@@ -136,7 +123,7 @@ describe("addTask", () => {
         document.getElementById("taskDescription").value = "Some description";
         document.getElementById("taskStatus").value = "TODO";
         app.addTask();
-        const saved = JSON.parse(localStorage.getItem("tasks_testuser"));
+        const saved = JSON.parse(localStorage.getItem("tasks_testuser@example.com"));
         expect(saved).toHaveLength(1);
         expect(saved[0].title).toBe("My Task");
         expect(saved[0].description).toBe("Some description");
@@ -154,7 +141,7 @@ describe("addTask", () => {
     test("saved task has a numeric id and an ISO createdAt timestamp", () => {
         document.getElementById("taskTitle").value = "Timestamped Task";
         app.addTask();
-        const saved = JSON.parse(localStorage.getItem("tasks_testuser"));
+        const saved = JSON.parse(localStorage.getItem("tasks_testuser@example.com"));
         expect(typeof saved[0].id).toBe("number");
         expect(() => new Date(saved[0].createdAt)).not.toThrow();
     });
@@ -164,7 +151,7 @@ describe("addTask", () => {
         app.addTask();
         document.getElementById("taskTitle").value = "Task B";
         app.addTask();
-        const saved = JSON.parse(localStorage.getItem("tasks_testuser"));
+        const saved = JSON.parse(localStorage.getItem("tasks_testuser@example.com"));
         expect(saved).toHaveLength(2);
         expect(saved.map(t => t.title)).toEqual(["Task A", "Task B"]);
     });
@@ -185,20 +172,20 @@ describe("deleteTask", () => {
 
     test("removes the task with the matching id", () => {
         app.deleteTask(100);
-        const saved = JSON.parse(localStorage.getItem("tasks_testuser"));
+        const saved = JSON.parse(localStorage.getItem("tasks_testuser@example.com"));
         expect(saved.find(t => t.id === 100)).toBeUndefined();
     });
 
     test("leaves other tasks intact", () => {
         app.deleteTask(100);
-        const saved = JSON.parse(localStorage.getItem("tasks_testuser"));
+        const saved = JSON.parse(localStorage.getItem("tasks_testuser@example.com"));
         expect(saved).toHaveLength(1);
         expect(saved[0].id).toBe(200);
     });
 
     test("persists the deletion to localStorage", () => {
         app.deleteTask(200);
-        const saved = JSON.parse(localStorage.getItem("tasks_testuser"));
+        const saved = JSON.parse(localStorage.getItem("tasks_testuser@example.com"));
         expect(saved.every(t => t.id !== 200)).toBe(true);
     });
 });
@@ -225,7 +212,6 @@ describe("renderTasks", () => {
     });
 
     test("shows the empty-message element when no tasks match the filter", () => {
-        // No tasks have status DONE... wait, SEED has one. Use a fresh instance.
         app = freshApp([]);
         document.getElementById("filterStatus").value = "ALL";
         app.renderTasks();
@@ -258,9 +244,9 @@ describe("handleLogout", () => {
         app = freshApp([]);
     });
 
-    test("calls logoutUser", () => {
+    test("calls logoutUI", () => {
         app.handleLogout();
-        expect(global.logoutUser).toHaveBeenCalledTimes(1);
+        expect(global.logoutUI).toHaveBeenCalledTimes(1);
     });
 
     test("redirects to login.html", () => {

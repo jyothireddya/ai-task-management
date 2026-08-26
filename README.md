@@ -1,21 +1,36 @@
 # AI Task Management
 
-A browser-based task management application with per-user task isolation.
+A browser-based task management application with a UI-only demo login.
+
+## ⚠️ Security Notice
+
+**This application uses demo / client-side authentication only.**
+- Any valid email format and password (6+ characters) will work.
+- No credentials are stored or verified against a backend.
+- Only the email address is saved as a session marker in `localStorage`.
+- The password is **never** stored, hashed, or logged anywhere.
+- **Do not use this for storing sensitive data or in a production environment.**
+
+---
 
 ## Features
 
-### User Authentication (EPMEDUAI)
-- Register an account with a username and password
-- Sign in and sign out
-- Each user's tasks are stored separately
-- Unauthenticated users are redirected to the login page
-- Input validation with clear error messages
+### UI-Only Login
+
+- Email and password form with client-side validation
+- Inline error messages for invalid input (bad email format, short password)
+- Task UI is gated — unauthenticated visitors are redirected to the login page
+- Logout button clears the session and redirects to the login page
+- Password field is always cleared after every login attempt (success or failure)
+- Only a non-sensitive session marker (email) is stored in `localStorage`
 
 ### Task Management
+
 - Create tasks with a title, description, and status
 - View all tasks or filter by status
 - Delete tasks
-- Tasks persisted in browser `localStorage` (per user)
+- Tasks are stored per-user in browser `localStorage`
+- All rendered content is XSS-protected via `escapeHtml()`
 
 ## Task Statuses
 
@@ -27,7 +42,7 @@ A browser-based task management application with per-user task isolation.
 
 ## Technology
 
-- HTML5, CSS3, vanilla JavaScript
+- HTML5, CSS3, vanilla JavaScript — no build step, no bundler
 - Browser `localStorage` for persistence (no backend required)
 - Jest + jsdom for automated tests
 
@@ -41,7 +56,7 @@ No build step or server is required.
    cd ai-task-management
    ```
 
-2. Open `login.html` in a web browser (double-click or use a local server):
+2. Open `login.html` in a web browser:
    ```
    # macOS / Linux
    open login.html
@@ -49,12 +64,24 @@ No build step or server is required.
    # Windows
    start login.html
 
-   # Or with a local server (e.g. VS Code Live Server, or Python):
+   # Or with a local server (Python):
    python -m http.server 8080
    # then open http://localhost:8080/login.html
    ```
 
-3. Register a new account, then sign in to manage tasks.
+3. Enter any valid email (e.g. `demo@example.com`) and any password 6+ characters long. Click **Login**.
+
+4. You will be taken to the task management page. Use the **Sign Out** button to log out.
+
+## How the UI-Only Login Works
+
+The login is entirely client-side with no real credential verification:
+
+1. The login form validates that the email field contains a properly formatted email address and that the password is at least 6 characters long.
+2. If validation passes, a session marker `{ email: "..." }` is written to `localStorage` under the key `ui_session`.
+3. The password is **immediately discarded** — it is cleared from the input field and never written to storage.
+4. `index.html` checks for the session marker on load. If it is absent, the user is redirected to `login.html`.
+5. Clicking **Sign Out** removes the session marker and redirects to the login page.
 
 ## Running Tests
 
@@ -64,40 +91,38 @@ npm test
 ```
 
 The test suite covers:
-- Password hashing consistency
-- User registration (success, duplicate username, short username, short password)
-- Login (success, wrong password, unknown user, case-insensitive username)
-- Logout and session clearing
-- Authentication state checks
-- Task status formatting and HTML escaping
+- Email format validation (empty, whitespace, bad format)
+- Password length validation
+- Session marker contents (only email stored, no password)
+- `isAuthenticated` state before and after login/logout
+- `requireAuth` redirect behaviour
+- Password field clearing after every login attempt
+- Inline error message display
+- Task status formatting and HTML escaping (`escapeHtml`)
 - Per-user storage key generation
+- `addTask`, `deleteTask`, `renderTasks`, `handleLogout`
 
 ## File Structure
 
 ```
 ai-task-management/
-├── login.html       # Login / Register page (entry point)
-├── index.html       # Main task management page
-├── auth.js          # Authentication logic
-├── app.js           # Task management logic
-├── style.css        # All styles
-├── package.json     # npm / Jest configuration
+├── login.html        # Login page (entry point)
+├── index.html        # Task management page
+├── auth-ui.js        # UI-only auth logic (session marker, validation)
+├── auth.js           # Original username-based auth module (preserved)
+├── app.js            # Task management logic
+├── style.css         # All styles
+├── package.json      # npm / Jest configuration
 ├── tests/
-│   ├── auth.test.js # Auth unit tests
-│   └── app.test.js  # App unit tests
+│   ├── login-ui.test.js   # Tests for auth-ui.js and login behaviour
+│   ├── app.test.js        # Tests for app.js task logic
+│   └── auth.test.js       # Tests for the original auth.js module
 └── README.md
 ```
 
-## Security Notes
+## Limitations
 
-This application runs entirely in the browser with no backend.
-Passwords are hashed with a client-side algorithm for demo purposes only.
-**Do not use this for storing sensitive data in a production environment.**
-
-## Limitations & Future Improvements
-
-- Task priority and due dates
-- Full-text search
-- Task editing
-- Backend API with server-side authentication (e.g. JWT / OAuth)
-- Database persistence
+- No real authentication — any email + 6-char password logs you in.
+- Data is stored only in the browser; clearing `localStorage` removes all tasks.
+- No task editing or priority fields.
+- No server-side persistence.
